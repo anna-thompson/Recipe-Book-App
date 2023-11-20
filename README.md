@@ -1,6 +1,6 @@
-# recipe_app
+# Recipe Book App
 
-A new Flutter project.
+A Flutter app that lets you view and add recipes to your recipe book.
 
 ## Getting Started
 
