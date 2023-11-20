@@ -1,6 +1,6 @@
-import 'package:english_words/english_words.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import "package:english_words/english_words.dart";
+import "package:flutter/material.dart";
+import "package:provider/provider.dart";
 
 void main() {
   runApp(MyApp());
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => MyAppState(),
       child: MaterialApp(
-        title: 'Namer App',
+        title: "Recipe Book App",
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(
@@ -27,23 +27,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppState extends ChangeNotifier {
-  var current = WordPair.random();
-
-  void getNext() {
-    current = WordPair.random();
-    notifyListeners();
-  }
-
-  var favorites = <WordPair>[];
-
-  void toggleFavorite() {
-    if (favorites.contains(current)) {
-      favorites.remove(current);
-    } else {
-      favorites.add(current);
-    }
-    notifyListeners();
-  }
+  var recipes = <Recipe>[Recipe(title: "Pancakes")];
 }
 
 class MyHomePage extends StatefulWidget {
@@ -65,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
         page = CategoriesPage();
         break;
       case 2:
-        page = NewPage();
+        page = NewRecipePage();
         break;
       case 3:
         page = FavoritesPage();
@@ -74,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
         page = SettingsPage();
         break;
       default:
-        throw UnimplementedError('no widget for $selectedIndex');
+        throw UnimplementedError("no widget for $selectedIndex");
     }
 
     return Scaffold(
@@ -84,23 +68,23 @@ class _MyHomePageState extends State<MyHomePage> {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Recipes',
+            label: "Recipes",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.category_rounded),
-            label: 'Categories',
+            label: "Categories",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add),
-            label: 'New',
+            label: "New",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite),
-            label: 'Favorites',
+            label: "Favorites",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
-            label: 'Settings',
+            label: "Settings",
           ),
         ],
         currentIndex: selectedIndex,
@@ -119,17 +103,46 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+class Recipe {
+  String title;
+  //List<String> ingredients = [];
+  //List<String> directions = [];
+
+  Recipe({String title = "Untitled Recipe"}) : this.title = title;
+}
+
+class RecipeCard extends StatelessWidget {
+  final Recipe recipe;
+
+  RecipeCard({required this.recipe});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold();
+  }
+}
+
 class RecipesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    //var appState = context.watch<MyAppState>();
+    var appState = context.watch<MyAppState>();
 
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Recipes"),
       ),
+      body: _buildRecipeList(appState.recipes),
     );
+  }
+
+  Widget _buildRecipeList(List<Recipe> recipes) {
+    if (recipes.isEmpty) {
+      return Center(
+        child: Text("My Recipes"),
+      );
+    }
+
+    return ListView();
   }
 }
 
@@ -138,18 +151,17 @@ class CategoriesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Categories'),
+        title: Text("Categories"),
       ),
       body: ListView(
         children: [
           ListTile(
-            title: Text('Breakfast'),
+            title: Text("Breakfast"),
             onTap: () {
-              // Navigate to a new page when the ListTile is tapped
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => CategoryDetailPage('Breakfast'),
+                  builder: (context) => CategoryDetailPage("Breakfast"),
                 ),
               );
             },
@@ -173,18 +185,24 @@ class CategoryDetailPage extends StatelessWidget {
         title: Text(categoryName),
       ),
       body: Center(
-        child: Text('Details for $categoryName'),
+        child: Text("Details for $categoryName"),
       ),
     );
   }
 }
 
-class NewPage extends StatelessWidget {
+class NewRecipePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //var appState = context.watch<MyAppState>();
-
-    return Scaffold();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("New Recipe"),
+      ),
+      body: Center(
+        child: Text("New Recipe"),
+      ),
+    );
   }
 }
 
@@ -192,8 +210,14 @@ class FavoritesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //var appState = context.watch<MyAppState>();
-
-    return Scaffold();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Favorites"),
+      ),
+      body: Center(
+        child: Text("You haven't saved any recipes to your favorites yet."),
+      ),
+    );
   }
 }
 
@@ -201,7 +225,13 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //var appState = context.watch<MyAppState>();
-
-    return Scaffold();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Settings"),
+      ),
+      body: Center(
+        child: Text("Settings"),
+      ),
+    );
   }
 }
