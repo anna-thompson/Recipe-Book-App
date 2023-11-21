@@ -1,4 +1,3 @@
-import "package:english_words/english_words.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 
@@ -27,7 +26,18 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppState extends ChangeNotifier {
-  var recipes = <Recipe>[Recipe(title: "Pancakes")];
+  var recipes = <Recipe>[
+    Recipe(name: "Pancakes"),
+    Recipe(name: "Ravioli"),
+    Recipe(name: "Spaghetti"),
+    Recipe(name: "Grilled Chicken"),
+    Recipe(name: "Pizza"),
+  ];
+
+  void addRecipe(Recipe recipe) {
+    recipes.add(recipe);
+    notifyListeners();
+  }
 }
 
 class MyHomePage extends StatefulWidget {
@@ -104,11 +114,14 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class Recipe {
-  String title;
+  String name;
+  String description;
   //List<String> ingredients = [];
   //List<String> directions = [];
 
-  Recipe({String title = "Untitled Recipe"}) : this.title = title;
+  Recipe({String name = "Untitled Recipe", String description = ""})
+      : this.name = name,
+        this.description = description;
 }
 
 class RecipeCard extends StatelessWidget {
@@ -118,7 +131,34 @@ class RecipeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Card(
+      margin: EdgeInsets.all(8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 6,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RecipeDetailsPage(recipe),
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: Text(
+              recipe.name,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -131,18 +171,51 @@ class RecipesPage extends StatelessWidget {
       appBar: AppBar(
         title: Text("Recipes"),
       ),
-      body: _buildRecipeList(appState.recipes),
+      body: _buildRecipeGrid(appState.recipes),
     );
   }
 
-  Widget _buildRecipeList(List<Recipe> recipes) {
+  Widget _buildRecipeGrid(List<Recipe> recipes) {
     if (recipes.isEmpty) {
       return Center(
         child: Text("My Recipes"),
       );
     }
 
-    return ListView();
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 8.0,
+          mainAxisSpacing: 8.0,
+          childAspectRatio: 0.8, // Adjust the aspect ratio to make the cards longer vertically
+        ),
+        itemCount: recipes.length,
+        itemBuilder: (context, index) {
+          return RecipeCard(recipe: recipes[index]);
+        },
+      ),
+    );
+  }
+}
+
+class RecipeDetailsPage extends StatelessWidget {
+  final Recipe recipe;
+
+  RecipeDetailsPage(this.recipe);
+
+  @override
+  Widget build(BuildContext context) {
+    //var recipeName = recipe.name ?? "Intitled Recipe"; // Use a default value if name is null
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(recipe.name),
+      ),
+      body: Center(
+        child: Text("Details for $recipe"),
+      ),
+    );
   }
 }
 
