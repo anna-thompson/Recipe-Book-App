@@ -1,4 +1,4 @@
-name: namer_app
+name: recipe_app
 description: A new Flutter project.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -12,7 +12,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-  english_words: ^4.0.0
+  image_picker: ^0.8.9
+
   provider: ^6.0.0
 
 dev_dependencies:
