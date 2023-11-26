@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 void main() {
   runApp(MyApp());
@@ -30,11 +32,15 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   var recipes = <Recipe>[
-    Recipe(name: "Pancakes"),
-    Recipe(name: "Ravioli"),
-    Recipe(name: "Spaghetti"),
-    Recipe(name: "Grilled Chicken"),
-    Recipe(name: "Pizza", description: "Pizza!"),
+    Recipe(
+        name: "Pancakes",
+        description: "So light and fluffy!",
+        imageLink:
+            "https://images.unsplash.com/photo-1565299543923-37dd37887442?q=80&w=1981&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
+    Recipe(name: "Ravioli", description: "Prep veggies before starting the ravioli.", imageLink: "https://images.unsplash.com/photo-1587740908075-9e245070dfaa?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
+    Recipe(name: "Spaghetti", imageLink: "https://plus.unsplash.com/premium_photo-1664472682525-0c0b50534850?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
+    Recipe(name: "Grilled Chicken", imageLink: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
+    Recipe(name: "Pizza", description: "Pizza!", imageLink: "https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
   ];
 
   void addRecipe(Recipe recipe) {
@@ -124,11 +130,16 @@ class _MyHomePageState extends State<MyHomePage> {
 class Recipe {
   String name;
   String description;
-  String? imagePath;
+  String imageLink;
 
-  Recipe({String name = "Untitled Recipe", String description = ""})
+  Recipe(
+      {String name = "Untitled Recipe",
+      String description = "",
+      String imageLink =
+          "https://images.unsplash.com/photo-1615799998603-7c6270a45196?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"})
       : this.name = name,
-        this.description = description;
+        this.description = description,
+        this.imageLink = imageLink;
 }
 
 class RecipeCard extends StatelessWidget {
@@ -151,15 +162,34 @@ class RecipeCard extends StatelessWidget {
             ),
           );
         },
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Align(
-            alignment: Alignment.bottomLeft,
-            child: Text(
-              recipe.name,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
+        child: Container(
+          height: 150,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            image: DecorationImage(
+              image: NetworkImage(recipe.imageLink),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: Text(
+                recipe.name,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Colors.white,
+                  shadows: <Shadow>[
+                    Shadow(
+                      offset: Offset(1, 1),
+                      blurRadius: 7.0,
+                      color: Color.fromARGB(255, 0, 0, 0),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -208,7 +238,94 @@ class RecipesPage extends StatelessWidget {
   }
 }
 
-class RecipeDetailsPage extends StatefulWidget {
+class RecipeDetailsPage extends StatelessWidget {
+  final Recipe recipe;
+
+  RecipeDetailsPage(this.recipe);
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Scaffold(
+      body: SlidingUpPanel( 
+        minHeight: (size.height / 2),
+        maxHeight: (size.height / 1.2),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+        parallaxEnabled: true,
+        body: SingleChildScrollView(
+          child: Stack(
+            children: [
+              Container(
+                height: (size.height / 2) + 50,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage(recipe.imageLink),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 40,
+                left: 20,
+                child: InkWell(
+                  onTap: () => Navigator.pop(context),
+                  child: Icon(
+                    CupertinoIcons.back,
+                    color: Colors.white,
+                    size: 38,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        panel: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  height: 5,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              Text(
+                recipe.name,
+                style: TextStyle(
+                  fontSize: 25,
+                  //color: Colors.black.withOpacity(0.5),
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                recipe.description,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black.withOpacity(0.5),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/*class RecipeDetailsPage extends StatefulWidget {
   final Recipe recipe;
 
   RecipeDetailsPage(this.recipe);
@@ -226,7 +343,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
       if (pickedFile != null) {
         setState(() {
           _imageFile = File(pickedFile.path);
-          widget.recipe.imagePath = pickedFile.path;
+          //widget.recipe.imagePath = pickedFile.path;
         });
       }
     } catch (e) {
@@ -265,8 +382,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
                         onSelected: handleClick,
                         itemBuilder: (BuildContext context) {
                           return {
-                            "Upload Photo",
-                            "Take Photo",
+                            "Edit",
                             "Delete Recipe"
                           }.map((String choice) {
                             return PopupMenuItem<String>(
@@ -314,11 +430,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
   
   void handleClick(String value) async {
     switch (value) {
-      case "Upload Photo":
-        await _pickImage(ImageSource.gallery);
-        break;
-      case "Take Photo":
-        await _pickImage(ImageSource.camera);
+      case "Edit":
         break;
       case "Delete Recipe":
         _deleteRecipe();
@@ -359,7 +471,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
   appState.deleteRecipe(widget.recipe);
   Navigator.pop(context); // Navigate back to the previous screen
   }
-}
+} */
 
 class CategoriesPage extends StatelessWidget {
   @override
